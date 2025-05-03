@@ -10,22 +10,20 @@
     <div id="live2d-widget"></div>
 
     <!-- Load Live2D Library -->
-    <script src="https://fastly.jsdelivr.net/npm/live2d-widgets@0/autoload.js" onload="initLive2D()"></script>
+    <script src="https://cdn.jsdelivr.net/gh/stevenjoezhang/live2d-widget@latest/autoload.js"></script>
 
     <!-- Initialize Miku -->
     <script>
-        function initLive2D() { // function to call when library is loaded
-            L2Dwidget.init({ // L2Dwidget and not live2dWidget
-                model: {
-                    jsonPath: "https://raw.githubusercontent.com/azmilazzo/live2d-idol/main/miku/runtime/miku.model3.json"
-                },
-                display: {
-                    position: "right",
-                    width: 200,
-                    height: 400
-                }
-            });
-        }
+        live2dWidget.init({
+            model: {
+                jsonPath: "https://raw.githubusercontent.com/azmilazzo/live2d-idol/main/miku/runtime/miku.model3.json"
+            },
+            display: {
+                position: "right",
+                width: 200,
+                height: 400
+            }
+        });
     </script>
 </body>
 </html>
