@@ -1,0 +1,16 @@
+{
+    "model": {
+        "jsonPath": "/miku/runtime/miku.model3.json",
+        "lazyLoadTextures": true
+    },
+    "display": {
+        "position": "right",
+        "width": 200,
+        "height": 400
+    },
+    "mobile": {
+        "show": true,
+        "scale": 0.5,
+        "motion": true
+    }
+}
