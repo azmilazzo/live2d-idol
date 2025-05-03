@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/live2d-widget@latest/autoload.js"></script>
+    <style>
+        body { margin: 0; }
+        #live2d-widget { width: 100%; height: 100vh; }
+    </style>
+</head>
+<body>
+    <div id="live2d-widget"></div>
+    <script>
+        live2dWidget.init({
+            model: {
+                jsonPath: "https://your-username.github.io/live2d-idol/miku.model3.json"
+            },
+            display: {
+                position: "right",
+                width: 200,
+                height: 400
+            }
+        });
+    </script>
+</body>
+</html>
