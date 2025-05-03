@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <script src="https://cdn.jsdelivr.net/npm/live2d-widget@latest/autoload.js"></script>
     <style>
         body { margin: 0; }
         #live2d-widget { width: 100%; height: 100vh; }
@@ -9,10 +8,15 @@
 </head>
 <body>
     <div id="live2d-widget"></div>
+
+    <!-- Load Live2D Library -->
+    <script src="https://cdn.jsdelivr.net/npm/live2d-widget@latest/autoload.js"></script>
+
+    <!-- Initialize Miku -->
     <script>
         live2dWidget.init({
             model: {
-                jsonPath: "https://github.com/azmilazzo/live2d-idol/tree/main/miku/runtime/miku.model3.json"
+                jsonPath: "https://raw.githubusercontent.com/azmilazzo/live2d-idol/main/miku/runtime/miku.model3.json"
             },
             display: {
                 position: "right",
