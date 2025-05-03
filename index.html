@@ -9,19 +9,33 @@
 <body>
     <div id="live2d-widget"></div>
 
-    <!-- Load Live2D Library -->
-    <script src="/"></script>
+    <!-- Load Local Live2D Library -->
+    <script src="/live2d.min.js"></script>
+    <script src="/waifu-tips.js"></script>
 
     <!-- Initialize Miku -->
     <script>
         live2dWidget.init({
             model: {
-                jsonPath: "/miku.model3.json"
-    },
-    display: {
-        position: "right",
-        width: 200,
-        height: 400
+                jsonPath: "/miku.model3.json", // Ensure this file exists in your repo
+                "scale": 1.0,
+                "mobileScale": 0.5
+            },
+            display: {
+                "position": "right",
+                "width": 200,
+                "height": 400,
+                "hOffset": 0,
+                "vOffset": 0
+            },
+            mobile: {
+                "show": true,
+                "scale": 0.5,
+                "motion": true
+            },
+            react: {
+                "opacityDefault": 0.7,
+                "opacityOnHover": 0.2
             }
         });
     </script>
