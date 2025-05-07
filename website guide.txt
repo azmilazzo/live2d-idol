@@ -1,0 +1,11 @@
+https://codepen.io/guansss/pen/KKgXBOP/left?editors=0010
+
+https://azurlane.nagami.moe/live2d-viewer
+
+https://d4dj.info/live2d
+
+https://jupiterbjy.github.io/SimpleLive2dViewer/?https://cdn.jsdelivr.net/gh/guansss/pixi-live2d-display/test/assets/shizuku/shizuku.model.json
+
+https://github.com/jupiterbjy/SimpleLive2dViewer
+
+https://docs.live2d.com/en/cubism-sdk-tutorials/sample-build-web/
