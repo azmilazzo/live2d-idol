@@ -90,19 +90,20 @@
             ctrack.draw(overlay); // Draw tracking points
 
             if (positions) {
-                // Example: control model head position by face position
+                console.log("Tracking positions:", positions); // Log positions for debugging
+
                 const faceX = positions[33][0]; // Nose tip x-position
                 const faceY = positions[33][1]; // Nose tip y-position
 
-                // Adjust these values to match your model's response
                 const modelX = (faceX / video.width - 0.5) * 2;
                 const modelY = (faceY / video.height - 0.5) * 2;
 
-                // Update model position (considering normalizing values)
                 L2Dwidget.position({
                     x: modelX * 0.1, // Scale down for subtlety
                     y: modelY * 0.1
                 });
+            } else {
+                console.log("No face detected"); // Log if no face is detected
             }
         }
 
