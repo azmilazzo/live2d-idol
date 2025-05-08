@@ -64,11 +64,11 @@
             }
         });
 
-        // Video setup
         const video = document.getElementById('video');
         const overlay = document.getElementById('overlay');
         const overlayContext = overlay.getContext('2d');
 
+        // Setup the video stream
         navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
             .then((stream) => {
                 video.srcObject = stream;
@@ -90,7 +90,7 @@
             ctrack.draw(overlay); // Draw tracking points
 
             if (positions) {
-                console.log("Tracking positions:", positions); // Log positions for debugging
+                console.log("Tracking positions:", positions);
 
                 const faceX = positions[33][0]; // Nose tip x-position
                 const faceY = positions[33][1]; // Nose tip y-position
@@ -103,7 +103,7 @@
                     y: modelY * 0.1
                 });
             } else {
-                console.log("No face detected"); // Log if no face is detected
+                console.log("No face detected");
             }
         }
 
