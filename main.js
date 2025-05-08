@@ -2,57 +2,57 @@ let live2dModel = null;
 const live2dCanvas = document.getElementById('live2dCanvas');
 const videoPreview = document.getElementById('videoPreview');
 
-function initLive2D() {
+function setUpLive2DModel() {
   loadlive2d("live2dCanvas", "path/to/your/live2d/model.json", () => {
-    console.log('Live2D model loaded');
+    console.log('Live2D model successfully loaded');
     live2dModel = document.getElementById('live2dCanvas').getContext('webgl');
   });
 }
 
-function initVideoPreview() {
+function activateVideoPreview() {
   navigator.mediaDevices.getUserMedia({ video: true })
     .then(stream => {
       videoPreview.srcObject = stream;
     })
     .catch(err => {
-      console.error('Error accessing webcam:', err);
+      console.error('Unable to access the webcam:', err);
     });
 }
 
-function updateLive2D(detectState) {
+function refreshLive2DModel(detectState) {
   if (!live2dModel) return;
 
-  const headX = detectState.expressions.headX || 0; // Change based on actual data
-  const headY = detectState.expressions.headY || 0;
+  const horizontalHeadMovement = detectState.expressions.headX || 0; // Adjust as necessary
+  const verticalHeadMovement = detectState.expressions.headY || 0;
 
-  live2dModel.setParamFloat("PARAM_ANGLE_X", headX * 30); // Adjust sensitivity
-  live2dModel.setParamFloat("PARAM_ANGLE_Y", headY * 30);
+  live2dModel.setParamFloat("PARAM_ANGLE_X", horizontalHeadMovement * 30); // Modify sensitivity
+  live2dModel.setParamFloat("PARAM_ANGLE_Y", verticalHeadMovement * 30);
 }
 
-function start() {
+function initiateTracking() {
   WebARRocksFaceDebugHelper.init({
     spec: {
       NNCPath: 'https://cdn.jsdelivr.net/gh/WebAR-rocks/WebAR.rocks.face@latest/neuralNets/NN_AUTOBONES_21.json'
     },
     callbackReady: function(err, spec) {
       if (err) {
-        console.error('An error occurred:', err);
+        console.error('Initialization error:', err);
         return;
       }
-      initLive2D();
-      initVideoPreview();
+      setUpLive2DModel();
+      activateVideoPreview();
     },
     callbackTrack: function(detectState) {
-      updateLive2D(detectState);
+      refreshLive2DModel(detectState);
     }
   })
 }
 
-function main() {
+function initialize() {
   WebARRocksResizer.size_canvas({
     canvasId: 'WebARRocksFaceCanvas',
-    callback: start
+    callback: initiateTracking
   });
 }
 
-window.addEventListener('load', main);
+window.addEventListener('load', initialize);
