@@ -3,9 +3,10 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Live2D with Face Tracking</title>
+    <title>Live2D with FaceMesh Tracking</title>
     <script src="https://cdn.jsdelivr.net/npm/live2d-widget@3.1.4/lib/L2Dwidget.min.js"></script>
-    <script src="https://unpkg.com/clmtrackr@1.1.2/build/clmtrackr.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/facemesh"></script>
     <style>
         body {
             margin: 0;
@@ -23,7 +24,7 @@
             object-fit: cover;
             border: 2px solid #fff;
             z-index: 1000;
-            transform: scaleX(-1); /* Flip horizontally */
+            transform: scaleX(-1);
         }
         canvas {
             position: absolute;
@@ -31,8 +32,8 @@
             left: 10px;
             width: 160px;
             height: 120px;
-            z-index: 1001; /* Above video */
-            transform: scaleX(-1); /* Match video flip */
+            z-index: 1001;
+            transform: scaleX(-1);
         }
     </style>
 </head>
@@ -77,37 +78,53 @@
                 console.error("Error accessing webcam: " + err);
             });
 
-        // Initialize clmtrackr
-        const ctrack = new clm.tracker();
-        ctrack.init();
-        ctrack.start(video);
+        async function runFaceMesh() {
+            const model = await facemesh.load();
+            console.log("FaceMesh model loaded.");
 
-        function animate() {
-            requestAnimationFrame(animate);
-            const positions = ctrack.getCurrentPosition();
-
-            overlayContext.clearRect(0, 0, overlay.width, overlay.height);
-            ctrack.draw(overlay); // Draw tracking points
-
-            if (positions) {
-                console.log("Tracking positions:", positions);
-
-                const faceX = positions[33][0]; // Nose tip x-position
-                const faceY = positions[33][1]; // Nose tip y-position
-
-                const modelX = (faceX / video.width - 0.5) * 2;
-                const modelY = (faceY / video.height - 0.5) * 2;
-
-                L2Dwidget.position({
-                    x: modelX * 0.1, // Scale down for subtlety
-                    y: modelY * 0.1
+            async function detectFaces() {
+                const predictions = await model.estimateFaces({
+                    input: video
                 });
-            } else {
-                console.log("No face detected");
+
+                overlayContext.clearRect(0, 0, overlay.width, overlay.height);
+
+                if (predictions.length > 0) {
+                    predictions.forEach(prediction => {
+                        const keypoints = prediction.scaledMesh;
+
+                        // Draw facial keypoints
+                        overlayContext.fillStyle = 'red';
+                        for (let i = 0; i < keypoints.length; i++) {
+                            const [x, y] = keypoints[i];
+
+                            overlayContext.beginPath();
+                            overlayContext.arc(x, y, 1, 0, 2 * Math.PI);
+                            overlayContext.fill();
+                        }
+
+                        const faceX = keypoints[1][0];
+                        const faceY = keypoints[1][1];
+
+                        const modelX = (faceX / video.width - 0.5) * 2;
+                        const modelY = (faceY / video.height - 0.5) * 2;
+
+                        L2Dwidget.position({
+                            x: modelX * 0.1,
+                            y: modelY * 0.1
+                        });
+                    });
+                }
+
+                requestAnimationFrame(detectFaces);
             }
+
+            detectFaces();
         }
 
-        animate();
+        video.onloadeddata = () => {
+            runFaceMesh();
+        };
     </script>
 </body>
 </html>
