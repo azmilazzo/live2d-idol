@@ -2,136 +2,29 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Live2D with FaceMesh Tracking</title>
-    <script src="https://cdn.jsdelivr.net/npm/live2d-widget@3.1.4/lib/L2Dwidget.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/facemesh"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Face Tracking with Live2D</title>
+
+    <!-- Include WebAR.rocks.face and Live2D -->
+    <script src="https://cdn.jsdelivr.net/gh/WebAR-rocks/WebAR.rocks.face@latest/dist/WebARRocksFace.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/WebAR-rocks/WebAR.rocks.face@latest/helpers/WebARRocksFaceDebugHelper.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/WebAR-rocks/WebAR.rocks.face@latest/helpers/WebARRocksResizer.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/WebAR-rocks/WebAR.rocks.face@latest/helpers/landmarksStabilizers/WebARRocksLMStabilizer.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/WebAR-rocks/WebAR.rocks.face@latest/helpers/WebARRocksFaceExpressionsEvaluator.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/live2d-widget@3.0.4/lib/live2d.min.js"></script>
+
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background: #2a2a2a;
-            height: 100vh;
-            overflow: hidden;
-        }
-        video {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            width: 160px;
-            height: 120px;
-            object-fit: cover;
-            border: 2px solid #fff;
-            z-index: 1000;
-            transform: scaleX(-1);
-        }
-        canvas {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            width: 160px;
-            height: 120px;
-            z-index: 1001;
-            transform: scaleX(-1);
-        }
+        body { margin: 0; overflow: hidden; }
+        canvas, video { position: absolute; }
+        #live2dCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+        #videoPreview { width: 160px; height: 120px; top: 10px; left: 10px; z-index: 2; }
     </style>
 </head>
 <body>
-    <video id="video" autoplay muted playsinline></video>
-    <canvas id="overlay"></canvas>
+    <canvas id="WebARRocksFaceCanvas" width="600" height="600"></canvas>
+    <canvas id="live2dCanvas"></canvas>
+    <video id="videoPreview" autoplay muted></video>
 
-    <script>
-        function initializeLive2D(scale) {
-            L2Dwidget.init({
-                model: {
-                    jsonPath: 'https://unpkg.com/live2d-widget-model-shizuku@1.0.5/assets/shizuku.model.json',
-                },
-                display: {
-                    position: 'center',
-                    width: window.innerWidth,
-                    height: window.innerHeight,
-                    hOffset: 0,
-                    vOffset: 0,
-                    scale: scale
-                },
-                mobile: {
-                    show: true,
-                    motion: false
-                },
-                react: {
-                    opacityDefault: 1,
-                    opacityOnHover: 1
-                }
-            });
-        }
-
-        const video = document.getElementById('video');
-        const overlay = document.getElementById('overlay');
-        const overlayContext = overlay.getContext('2d');
-
-        // Setup the video stream
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
-            .then((stream) => {
-                video.srcObject = stream;
-            })
-            .catch((err) => {
-                console.error("Error accessing webcam: " + err);
-            });
-
-        video.onloadedmetadata = () => {
-            const scale = Math.min(window.innerWidth / 800, window.innerHeight / 600);
-            initializeLive2D(scale);
-            runFaceMesh();
-        };
-
-        async function runFaceMesh() {
-            const model = await facemesh.load();
-            console.log("FaceMesh model loaded.");
-
-            async function detectFaces() {
-                const predictions = await model.estimateFaces(video);
-
-                overlayContext.clearRect(0, 0, overlay.width, overlay.height);
-
-                if (predictions.length > 0) {
-                    predictions.forEach(prediction => {
-                        const keypoints = prediction.scaledMesh;
-
-                        // Draw facial keypoints
-                        overlayContext.fillStyle = 'red';
-                        keypoints.forEach(([x, y]) => {
-                            overlayContext.beginPath();
-                            overlayContext.arc(x, y, 1, 0, 2 * Math.PI);
-                            overlayContext.fill();
-                        });
-
-                        const faceX = keypoints[1][0];
-                        const faceY = keypoints[1][1];
-
-                        const modelX = (faceX / video.width - 0.5) * 2;
-                        const modelY = (faceY / video.height - 0.5) * 2;
-
-                        L2Dwidget.position({
-                            x: modelX * 0.1,
-                            y: modelY * 0.1
-                        });
-                    });
-                } else {
-                    console.log("No face detected");
-                }
-
-                requestAnimationFrame(detectFaces);
-            }
-
-            detectFaces();
-        }
-
-        // Adjust model scale on window resize
-        window.addEventListener('resize', () => {
-            const scale = Math.min(window.innerWidth / 800, window.innerHeight / 600);
-            initializeLive2D(scale);
-        });
-    </script>
+    <script src="main.js"></script>
 </body>
 </html>
