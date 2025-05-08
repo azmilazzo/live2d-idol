@@ -42,9 +42,7 @@
     <canvas id="overlay"></canvas>
 
     <script>
-        function initializeLive2D() {
-            const scale = Math.min(window.innerWidth / 800, window.innerHeight / 600);
-
+        function initializeLive2D(scale) {
             L2Dwidget.init({
                 model: {
                     jsonPath: 'https://unpkg.com/live2d-widget-model-shizuku@1.0.5/assets/shizuku.model.json',
@@ -54,11 +52,11 @@
                     width: window.innerWidth,
                     height: window.innerHeight,
                     hOffset: 0,
-                    vOffset: 0
+                    vOffset: 0,
+                    scale: scale
                 },
                 mobile: {
                     show: true,
-                    scale: scale, // Auto-scale based on window size
                     motion: false
                 },
                 react: {
@@ -67,8 +65,6 @@
                 }
             });
         }
-
-        initializeLive2D();
 
         const video = document.getElementById('video');
         const overlay = document.getElementById('overlay');
@@ -83,16 +79,18 @@
                 console.error("Error accessing webcam: " + err);
             });
 
+        video.onloadedmetadata = () => {
+            const scale = Math.min(window.innerWidth / 800, window.innerHeight / 600);
+            initializeLive2D(scale);
+            runFaceMesh();
+        };
+
         async function runFaceMesh() {
             const model = await facemesh.load();
             console.log("FaceMesh model loaded.");
 
             async function detectFaces() {
-                const predictions = await model.estimateFaces({
-                    input: video
-                });
-
-                console.log("Predictions:", predictions);
+                const predictions = await model.estimateFaces(video);
 
                 overlayContext.clearRect(0, 0, overlay.width, overlay.height);
 
@@ -102,13 +100,11 @@
 
                         // Draw facial keypoints
                         overlayContext.fillStyle = 'red';
-                        for (let i = 0; i < keypoints.length; i++) {
-                            const [x, y] = keypoints[i];
-
+                        keypoints.forEach(([x, y]) => {
                             overlayContext.beginPath();
                             overlayContext.arc(x, y, 1, 0, 2 * Math.PI);
                             overlayContext.fill();
-                        }
+                        });
 
                         const faceX = keypoints[1][0];
                         const faceY = keypoints[1][1];
@@ -131,13 +127,10 @@
             detectFaces();
         }
 
-        video.onloadeddata = () => {
-            runFaceMesh();
-        };
-
         // Adjust model scale on window resize
         window.addEventListener('resize', () => {
-            initializeLive2D();
+            const scale = Math.min(window.innerWidth / 800, window.innerHeight / 600);
+            initializeLive2D(scale);
         });
     </script>
 </body>
