@@ -42,28 +42,33 @@
     <canvas id="overlay"></canvas>
 
     <script>
-        // Initialize Live2D model
-        L2Dwidget.init({
-            model: {
-                jsonPath: 'https://unpkg.com/live2d-widget-model-shizuku@1.0.5/assets/shizuku.model.json',
-            },
-            display: {
-                position: 'center',
-                width: window.innerWidth,
-                height: window.innerHeight,
-                hOffset: 0,
-                vOffset: 0
-            },
-            mobile: {
-                show: true,
-                scale: 1,
-                motion: true
-            },
-            react: {
-                opacityDefault: 1,
-                opacityOnHover: 1
-            }
-        });
+        function initializeLive2D() {
+            const scale = Math.min(window.innerWidth / 800, window.innerHeight / 600);
+
+            L2Dwidget.init({
+                model: {
+                    jsonPath: 'https://unpkg.com/live2d-widget-model-shizuku@1.0.5/assets/shizuku.model.json',
+                },
+                display: {
+                    position: 'center',
+                    width: window.innerWidth,
+                    height: window.innerHeight,
+                    hOffset: 0,
+                    vOffset: 0
+                },
+                mobile: {
+                    show: true,
+                    scale: scale, // Auto-scale based on window size
+                    motion: false
+                },
+                react: {
+                    opacityDefault: 1,
+                    opacityOnHover: 1
+                }
+            });
+        }
+
+        initializeLive2D();
 
         const video = document.getElementById('video');
         const overlay = document.getElementById('overlay');
@@ -86,6 +91,8 @@
                 const predictions = await model.estimateFaces({
                     input: video
                 });
+
+                console.log("Predictions:", predictions);
 
                 overlayContext.clearRect(0, 0, overlay.width, overlay.height);
 
@@ -114,6 +121,8 @@
                             y: modelY * 0.1
                         });
                     });
+                } else {
+                    console.log("No face detected");
                 }
 
                 requestAnimationFrame(detectFaces);
@@ -125,6 +134,11 @@
         video.onloadeddata = () => {
             runFaceMesh();
         };
+
+        // Adjust model scale on window resize
+        window.addEventListener('resize', () => {
+            initializeLive2D();
+        });
     </script>
 </body>
 </html>
