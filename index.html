@@ -23,11 +23,22 @@
             object-fit: cover;
             border: 2px solid #fff;
             z-index: 1000;
+            transform: scaleX(-1); /* Flip horizontally */
+        }
+        canvas {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 160px;
+            height: 120px;
+            z-index: 1001; /* Above video */
+            transform: scaleX(-1); /* Match video flip */
         }
     </style>
 </head>
 <body>
     <video id="video" autoplay muted playsinline></video>
+    <canvas id="overlay"></canvas>
 
     <script>
         // Initialize Live2D model
@@ -55,9 +66,10 @@
 
         // Video setup
         const video = document.getElementById('video');
-        
-        // Try accessing the camera
-        navigator.mediaDevices.getUserMedia({ video: true })
+        const overlay = document.getElementById('overlay');
+        const overlayContext = overlay.getContext('2d');
+
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
             .then((stream) => {
                 video.srcObject = stream;
             })
@@ -73,6 +85,10 @@
         function animate() {
             requestAnimationFrame(animate);
             const positions = ctrack.getCurrentPosition();
+
+            overlayContext.clearRect(0, 0, overlay.width, overlay.height);
+            ctrack.draw(overlay); // Draw tracking points
+
             if (positions) {
                 // Example: control model head position by face position
                 const faceX = positions[33][0]; // Nose tip x-position
